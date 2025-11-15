@@ -51,57 +51,57 @@ def admin_delete_asset(request, asset_id):
     messages.success(request, "Asset deleted successfully")
     return redirect('admin_manage_assets')
 
-# Change asset status
-# def admin_change_asset_status(request, asset_id):
-#     if request.method == "POST":
-#         asset = get_object_or_404(Asset, id=asset_id)
-#         new_status = request.POST.get('status')
-#         note = request.POST.get('note', '')
-#         changed_by = request.user
-#         # if new_status in AssetStatus.values:
-#         asset.current_status = new_status
-#         asset.save()
-#         AssetStatusHistory.objects.create(
-#             asset=asset,
-#             status=new_status,
-#             changed_by=changed_by,
-#             note=note
-#         )
-#         messages.success(request, "Status updated successfully")
-#     return redirect("admin_manage_assets")
-
-
-from django.http import JsonResponse
-
+#Change asset status
 def admin_change_asset_status(request, asset_id):
-    if request.method == "POST" and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+    if request.method == "POST":
         asset = get_object_or_404(Asset, id=asset_id)
         new_status = request.POST.get('status')
         note = request.POST.get('note', '')
         changed_by = request.user
-
+        # if new_status in AssetStatus.values:
         asset.current_status = new_status
         asset.save()
-
         AssetStatusHistory.objects.create(
             asset=asset,
             status=new_status,
             changed_by=changed_by,
             note=note
         )
+        messages.success(request, "Status updated successfully")
+    return redirect("admin_manage_assets")
 
-        # Return updated counts
-        status_counts = {
-            'inventory': Asset.objects.filter(current_status=AssetStatus.INVENTORY).count(),
-            'assigned': Asset.objects.filter(current_status=AssetStatus.ASSIGNED).count(),
-            'repair': Asset.objects.filter(current_status=AssetStatus.REPAIR).count(),
-            'retired': Asset.objects.filter(current_status=AssetStatus.RETIRED).count(),
-        }
 
-        return JsonResponse({
-            'success': True,
-            'status_counts': status_counts,
-            'asset_id': asset.id,
-            'new_status': asset.current_status.value
-        })
+# from django.http import JsonResponse
+
+# def admin_change_asset_status(request, asset_id):
+#     if request.method == "POST" and request.headers.get('x-requested-with') == 'XMLHttpRequest':
+#         asset = get_object_or_404(Asset, id=asset_id)
+#         new_status = request.POST.get('status')
+#         note = request.POST.get('note', '')
+#         changed_by = request.user
+
+#         asset.current_status = new_status
+#         asset.save()
+
+#         AssetStatusHistory.objects.create(
+#             asset=asset,
+#             status=new_status,
+#             changed_by=changed_by,
+#             note=note
+#         )
+
+#         # Return updated counts
+#         status_counts = {
+#             'inventory': Asset.objects.filter(current_status=AssetStatus.INVENTORY).count(),
+#             'assigned': Asset.objects.filter(current_status=AssetStatus.ASSIGNED).count(),
+#             'repair': Asset.objects.filter(current_status=AssetStatus.REPAIR).count(),
+#             'retired': Asset.objects.filter(current_status=AssetStatus.RETIRED).count(),
+#         }
+
+#         return JsonResponse({
+#             'success': True,
+#             'status_counts': status_counts,
+#             'asset_id': asset.id,
+#             'new_status': asset.current_status.value
+#         })
 

@@ -114,15 +114,14 @@ def admin_add_vendor(request):
              
     return redirect('admin_manage_vendors')
 
-# Delete vendor
-def admin_delete_vendor(request, vendor_id):
-    vendor = get_object_or_404(Vendor, id=vendor_id)
-    if vendor.assets.exists():
-        messages.error(request, "Vendor has assets. Reassign/delete assets first.")
-        return redirect('admin_manage_vendors')
+
+
+
+def admin_delete_vendor(request, id):
+    vendor = get_object_or_404(Vendor, id=id)
     vendor.delete()
     messages.success(request, "Vendor deleted successfully")
-    return redirect('admin_manage_vendors')
+    return redirect("admin_manage_vendors")
 
 # View vendor assets
 def view_vendor_assets(request, vendor_id):
