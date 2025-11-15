@@ -1,0 +1,47 @@
+{% extends "admin/layout_admin.html" %}
+{% load static %}
+
+{% block title %}Assign Asset{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Assign Asset</h3>
+  <a href="{% url 'admin_view_assignments' %}" class="btn btn-secondary btn-sm">← Back</a>
+</div>
+
+<div class="panel p-4">
+  <h5 class="mb-3">Asset: {{ asset.name }}</h5>
+
+  <p><strong>Serial:</strong> {{ asset.serial_number }}</p>
+
+  <p><strong>Status:</strong> {{ asset.current_status|capfirst }}</p>
+
+  {% if asset.picture %}
+      <img src="{% static 'uploaded/' %}{{ asset.picture }}" 
+           alt="{{ asset.name }}" 
+           class="img-thumbnail mb-3"
+           style="max-width: 200px;">
+  {% endif %}
+
+  <form method="POST">
+      {% csrf_token %}
+
+      <div class="mb-3">
+          {{ form.assigned_to.label_tag }}
+          {{ form.assigned_to }}
+      </div>
+
+      <div class="mb-3">
+          {{ form.assigned_by.label_tag }}
+          {{ form.assigned_by }}
+      </div>
+
+      <div class="mb-3">
+          {{ form.note.label_tag }}
+          {{ form.note }}
+      </div>
+
+      <button type="submit" class="btn btn-dark">{{ form.submit.label }}</button>
+  </form>
+</div>
+{% endblock %}

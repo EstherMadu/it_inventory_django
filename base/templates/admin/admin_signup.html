@@ -1,0 +1,92 @@
+{% extends "admin/layout_admin.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Admin Signup - Construction Inventory{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'assets/bootstrap/css/bootstrap.css' %}">
+<style>
+  body { background-color: #fff; }
+  .btn-brand { background-color: #000; color: #fff; }
+  .btn-brand:hover { background-color: #222; color: #fff; }
+  .hero { padding: 50px 0; text-align: center; background-color: #C02000; color: #fff; }
+  .form-container { max-width: 400px; margin: 80px auto; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero">
+  <h1>Admin Signup</h1>
+  <p>Access the admin dashboard</p>
+</div>
+
+<div class="container mt-5" style="max-width: 500px;">
+  <h3 class="mb-4 text-center">Admin Signup</h3>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {# DISPLAY NON-FIELD ERRORS #}
+  {% if form.non_field_errors %}
+    {% for error in form.non_field_errors %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <form method="POST" novalidate>
+    {% csrf_token %}
+
+    <div class="mb-3">
+      {{ form.username.label_tag }}
+      {{ form.username|add_class:"form-control" }}
+      {% for error in form.username.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.email.label_tag }}
+      {{ form.email|add_class:"form-control" }}
+      {% for error in form.email.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.password.label_tag }}
+      {{ form.password|add_class:"form-control" }}
+      {% for error in form.password.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.confirm_password.label_tag }}
+      {{ form.confirm_password|add_class:"form-control" }}
+      {% for error in form.confirm_password.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="mb-3">
+      {{ form.department.label_tag }}
+      {{ form.department|add_class:"form-select" }}
+      {% for error in form.department.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="d-grid">
+      <button type="submit" class="btn btn-dark">Sign Up</button>
+    </div>
+
+    <p class="mt-2">Already have an account?
+      <a href="{% url 'admin_login' %}">Login</a>
+    </p>
+  </form>
+</div>
+{% endblock %}

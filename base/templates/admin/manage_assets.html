@@ -1,0 +1,188 @@
+{% extends "admin/layout_admin.html" %}
+{% load static %}
+{% block title %}Admin - Assets{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Assets</h3>
+  <div class="small-note">Upload, update status, and view history</div>
+</div>
+
+<form method="GET" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <select name="category" class="form-select">
+      <option value="">All Categories</option>
+      {% for c in categories %}
+        <option value="{{ c.id }}" {% if request.GET.category == c.id|stringformat:'s' %}selected{% endif %}>
+          {{ c.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <select name="vendor" class="form-select">
+      <option value="">All Vendors</option>
+      {% for v in vendors %}
+        <option value="{{ v.id }}" {% if request.GET.vendor == v.id|stringformat:'s' %}selected{% endif %}>
+          {{ v.vendor_name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <select name="status" class="form-select">
+  <option value="">All Statuses</option>
+  {% for s in statuses %}
+    <option value="{{ s }}" {% if request.GET.status == s %}selected{% endif %}>{{ s }}</option>
+  {% endfor %}
+</select>
+
+  </div>
+
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-dark w-100">Filter</button>
+  </div>
+</form>
+
+<div class="row g-3">
+  <div class="col-md-10">
+    <div class="panel">
+      <h5>All Assets</h5>
+
+      <table class="table align-middle">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th></th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Vendor</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for asset in assets %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+
+              <td>
+                {% if asset.picture %}
+                  <img src="{{ asset.picture.url }}" class="thumb" alt="thumb">
+                {% else %}
+                  <div class="thumb"
+                       style="background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#999">
+                    —
+                  </div>
+                {% endif %}
+              </td>
+
+              <td>
+                {{ asset.name }}
+                <div class="small-note">
+                  S/N: {{ asset.serial_number|default:"—" }}
+                </div>
+              </td>
+
+              <td>{{ asset.category.name|default:"—" }}</td>
+              <td>{{ asset.vendor.user.username|default:"—" }}</td>
+
+              <td>
+                <span class="badge bg-secondary">{{ asset.current_status }}</span>
+              </td>
+
+              <td style="min-width:220px;">
+
+                <form method="POST" action="{% url 'admin_change_asset_status' asset.id %}"
+                      style="display:flex;flex-direction:column;gap:6px;">
+                  {% csrf_token %}
+
+                  <select name="status" class="form-select form-select-sm">
+  {% for s in statuses %}
+    <option value="{{ s }}" {% if asset.current_status == s %}selected{% endif %}>
+      {{ s|lower }}
+    </option>
+  {% endfor %}
+</select>
+
+
+                  <input type="text" name="note" class="form-control form-control-sm" placeholder="note (optional)">
+
+                  <div class="d-flex gap-2">
+
+                    <a href="{% url 'admin_assign_asset' asset.id %}"
+                    
+                       class="btn btn-sm btn-dark">Assign</a>
+
+                    <button class="btn btn-sm btn-primary" type="submit">Update</button>
+
+                </form>
+
+                <form method="POST" action="{% url 'admin_delete_asset' asset.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                </form>
+
+                <a class="btn btn-sm btn-outline-secondary"
+                   href="{% url 'admin_view_status_history' asset.id %}">
+                  History
+                </a>
+
+              </td>
+            </tr>
+
+          {% empty %}
+            <tr><td colspan="7" class="text-center">No assets yet</td></tr>
+          {% endfor %}
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 d-flex align-items-center justify-content-between">
+  <div class="col-md-6">
+    <div class="panel">
+      <h5>Add Asset</h5>
+
+      <form method="POST" action="{% url 'admin_add_asset' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button class="btn btn-dark" type="submit">Add Asset</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+  function previewImage(event) {
+    const input = event.target;
+    const preview = document.getElementById('preview');
+
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+
+      reader.readAsDataURL(input.files[0]);
+    } else {
+      preview.src = '#';
+      preview.style.display = 'none';
+    }
+  }
+</script>
+{% endblock %}

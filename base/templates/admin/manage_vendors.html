@@ -1,0 +1,92 @@
+{% extends "admin/layout_admin.html" %}
+{% load widget_tweaks %}
+{% block title %}Admin - Vendors{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3>Vendors</h3>
+  <div class="small-note">Add or manage vendors</div>
+</div>
+
+<div class="row g-3">
+  <!-- ADD VENDOR FORM -->
+  <div class="col-md-4">
+    <div class="panel">
+      <h5 class="mb-3">Add Vendor</h5>
+
+      <form method="POST" action="{% url 'admin_add_vendor' %}">
+        {% csrf_token %}
+
+        <div class="mb-2">
+          <label class="form-label">{{ form.vendor_name.label }}</label>
+          {% render_field form.username class="form-control" %}
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">{{ form.vendor_email.label }}</label>
+          {% render_field form.email class="form-control" %}
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">{{ form.vendor_password.label }}</label>
+          {% render_field form.password class="form-control" %}
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">{{ form.vendor_confirm_password.label }}</label>
+          {% render_field form.confirm_password class="form-control" %}
+        </div>
+
+        <button type="submit" class="btn btn-dark">Submit</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ALL VENDORS TABLE -->
+  <div class="col-md-8">
+    <div class="panel">
+      <h5 class="mb-3">All vendors</h5>
+
+      <table class="table table-striped">
+        <thead class="table-dark">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Registered</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% if vendors %}
+            {% for v in vendors %}
+              <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ v.user.username }}</td>
+                <td>{{ v.user.email }}</td>
+                <td>{{ v.user.date_joined|date:"Y-m-d" }}</td>
+
+                <td>
+                  <a href="{% url 'view_vendor_assets' v.id %}" class="btn btn-sm btn-primary">View Assets</a>
+
+                  <form method="POST"
+                        action="{% url 'admin_delete_vendor' v.id %}"
+                        style="display:inline;">
+                      {% csrf_token %}
+                      <button class="btn btn-sm btn-danger" type="submit">Delete Vendor</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="5" class="text-center">No vendors found</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
